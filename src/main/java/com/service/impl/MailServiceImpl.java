@@ -1,7 +1,6 @@
 package com.service.impl;
 
 import com.service.IMailService;
-import groovy.util.logging.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
@@ -18,10 +17,9 @@ import javax.mail.internet.MimeMessage;
 import java.io.File;
 
 /**
- * @author tangj
+ * @author janti
  * @date 2018/5/3 22:07
  */
-@Slf4j
 @Component
 public class MailServiceImpl implements IMailService{
 
@@ -35,6 +33,13 @@ public class MailServiceImpl implements IMailService{
     @Value("${spring.mail.username}")
     private String mailFrom;
 
+    /**
+     * 发送简单邮件
+     *
+     * @param to
+     * @param subject
+     * @param content
+     */
     @Override
     public void sendSimpleEmail(String to,String subject,String content) {
         SimpleMailMessage message = new SimpleMailMessage();
@@ -45,8 +50,15 @@ public class MailServiceImpl implements IMailService{
         mailSender.send(message);
     }
 
+    /**
+     * 发送html邮件
+     *
+     * @param to
+     * @param subject
+     * @param content
+     */
     @Override
-    public void sendHtmlMail(String to, String subject, String context) {
+    public void sendHtmlMail(String to, String subject, String content) {
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         try {
             //true表示需要创建一个multipart message
@@ -54,13 +66,20 @@ public class MailServiceImpl implements IMailService{
             helper.setFrom(mailFrom);
             helper.setTo(to);
             helper.setSubject(subject);
-            helper.setText(context,true);
+            helper.setText(content,true);
             mailSender.send(mimeMessage);
         } catch (MessagingException e) {
             e.printStackTrace();
         }
     }
-
+    /**
+     * 发送带附件的邮件
+     *
+     * @param to
+     * @param subject
+     * @param content
+     * @param filepath
+     */
     @Override
     public void sendFileMail(String to, String subject, String content, String filepath) {
         MimeMessage mimeMessage = mailSender.createMimeMessage();
@@ -81,7 +100,12 @@ public class MailServiceImpl implements IMailService{
             e.printStackTrace();
         }
     }
-
+    /**
+     * 使用模板来发送邮件
+     *
+     * @param to
+     * @param subject
+     */
     @Override
     public void sendTemplateMail(String to, String subject) {
         Context context = new Context();
